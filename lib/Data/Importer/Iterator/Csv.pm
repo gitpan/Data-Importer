@@ -1,0 +1,82 @@
+#
+# This file is part of Data-Importer
+#
+# This software is copyright (c) 2014 by Kaare Rasmussen.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+package Data::Importer::Iterator::Csv;
+$Data::Importer::Iterator::Csv::VERSION = '0.001';
+use 5.010;
+use namespace::autoclean;
+use Moose;
+use Text::CSV;
+
+extends 'Data::Importer::Iterator';
+
+=head1 Description
+
+Subclass for handling the import of a csv file
+
+=head1 ATTRIBUTES
+
+=head2 csv
+
+The csv object
+
+=cut
+
+has 'csv' => (
+	is => 'ro',
+	lazy_build => 1,
+);
+
+=head1 "PRIVATE" ATTRIBUTES
+
+=head1 METHODS
+
+=head2 _build_csv
+
+The lazy builder for the csv object
+
+=cut
+
+sub _build_csv {
+	my $self = shift;
+	my $csv = Text::CSV->new ({ binary => 1, eol => $/ });
+	return $csv;
+}
+
+=head2 next
+
+Return the next row of data from the file
+
+=cut
+
+sub next {
+	my $self = shift;
+	my $file = $self->file;
+	my $csv = $self->csv;
+	# Use the first row as column names:
+	if (!$csv->column_names) {
+		my $row = $csv->getline($file);
+		my @fieldnames = map {my $header = lc $_; $header =~ tr/ /_/; $header} $csv->fields;
+		die "Only one column detected, please use comma ',' to separate data." if @fieldnames < 2;
+
+		$csv->column_names(@fieldnames);
+	}
+	$self->inc_lineno;
+    return $csv->getline_hr($file);
+}
+
+1;
+
+#
+# This file is part of Data-Importer
+#
+# This software is copyright (c) 2014 by Kaare Rasmussen.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#

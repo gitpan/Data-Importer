@@ -1,0 +1,58 @@
+Description
+    Base class for handling the import of the spreadsheet file
+
+Atttributes
+  schema
+  dry_run
+    Set to true if this is only a test
+
+  file_name
+    The name of the spreadsheet
+
+  import_type
+    Three formats are supported, csv, xls, ods
+
+"PRIVATE" ATTRIBUTES
+  import_iterator
+    An iterator for reading the import file
+
+  warnings
+    An arrayref w/ all the warnings picked up during processing
+
+  errors
+    An arrayref w/ all the errors picked up during processing
+
+  timestamp
+    Time of the import run.
+
+METHODS
+  _build_import_type
+    Build the import type. It can be either csv, xls or ods.
+
+  _build_import_iterator
+    Build the import iterator..
+
+  do_work
+    Import a file
+
+  validate
+    Validates the import file
+
+  handle_row
+    Handle each individual row.
+
+  import_run
+    Imports the nodes after validate has been run
+
+  import_transaction
+    Called inside the transaction block
+
+  import_failed
+    Called if the import failed for some reason
+
+  import_succeeded
+    Called after the import has finished succesful
+
+  report
+    Make a report of what happened
+
