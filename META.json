@@ -4,7 +4,7 @@
       "Kaare Rasmussen <kaare@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -74,23 +74,23 @@
    "provides" : {
       "Data::Importer" : {
          "file" : "lib/Data/Importer.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Data::Importer::Iterator" : {
          "file" : "lib/Data/Importer/Iterator.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Data::Importer::Iterator::Csv" : {
          "file" : "lib/Data/Importer/Iterator/Csv.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Data::Importer::Iterator::Ods" : {
          "file" : "lib/Data/Importer/Iterator/Ods.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Data::Importer::Iterator::Xls" : {
          "file" : "lib/Data/Importer/Iterator/Xls.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -102,6 +102,6 @@
          "web" : "https://github.com/kaare/Data-Importer"
       }
    },
-   "version" : "0.002"
+   "version" : "0.003"
 }
 

@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer;
-$Data::Importer::VERSION = '0.002';
+$Data::Importer::VERSION = '0.003';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -82,6 +82,23 @@ An iterator for reading the import file
 has 'import_iterator' => (
 	is => 'ro',
 	lazy_build => 1,
+);
+
+
+=head2 rows
+
+An arrayref w/ the rows to be inserted / updated
+
+=cut
+
+has 'rows' => (
+	is => 'ro',
+	isa => 'ArrayRef',
+	traits => [qw/Array/],
+	handles => {
+		add_row => 'push',
+	},
+	default => sub { [] },
 );
 
 =head2 warnings
@@ -197,17 +214,17 @@ sub validate {
 	my $iterator = $self->import_iterator;
 
 	while (my $row = $iterator->next) {
-		my $row_res = $self->handle_row($row, $iterator->lineno);
+		my $row_res = $self->validate_row($row, $iterator->lineno);
 	}
 }
 
-=head2 handle_row
+=head2 validate_row
 
 Handle each individual row.
 
 =cut
 
-sub handle_row {
+sub validate_row {
 	my ($self, $row, $lineno) = @_;
 
 	# XXX validation
@@ -232,7 +249,6 @@ sub import_run {
 	my $schema = $self->schema;
 	my $transaction = sub {
 		$self->import_transaction;
-		# XXX $datanode_rs->populate(\@datanodes) if @datanodes;
 		return;
 	};
 	my $rs;
@@ -252,8 +268,13 @@ Called inside the transaction block
 
 =cut
 
-sub import_transaction { }
-
+sub import_transaction {
+	my $self = shift;
+	my $schema = $self->schema;
+	for my $row (@{ $self->rows }) {
+		$self->import_row($row);
+	}
+}
 
 =head2 import_failed
 

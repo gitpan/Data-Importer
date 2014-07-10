@@ -16,6 +16,9 @@ Atttributes
   import_iterator
     An iterator for reading the import file
 
+  rows
+    An arrayref w/ the rows to be inserted / updated
+
   warnings
     An arrayref w/ all the warnings picked up during processing
 
@@ -38,7 +41,7 @@ METHODS
   validate
     Validates the import file
 
-  handle_row
+  validate_row
     Handle each individual row.
 
   import_run
