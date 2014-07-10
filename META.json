@@ -48,6 +48,7 @@
             "MooseX::Traits" : "0",
             "Spreadsheet::ParseExcel" : "0",
             "Spreadsheet::Read" : "0",
+            "Spreadsheet::ReadSXC" : "0",
             "Text::CSV" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010"
@@ -73,23 +74,23 @@
    "provides" : {
       "Data::Importer" : {
          "file" : "lib/Data/Importer.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Data::Importer::Iterator" : {
          "file" : "lib/Data/Importer/Iterator.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Data::Importer::Iterator::Csv" : {
          "file" : "lib/Data/Importer/Iterator/Csv.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Data::Importer::Iterator::Ods" : {
          "file" : "lib/Data/Importer/Iterator/Ods.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Data::Importer::Iterator::Xls" : {
          "file" : "lib/Data/Importer/Iterator/Xls.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -101,6 +102,6 @@
          "web" : "https://github.com/kaare/Data-Importer"
       }
    },
-   "version" : "0.001"
+   "version" : "0.002"
 }
 

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kaare Rasmussen <kaare\@cpan.org>"
   ],
   "dist_name" => "Data-Importer",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "perl",
   "module_name" => "Data::Importer",
   "recommends" => {},
@@ -31,6 +31,7 @@ my %module_build_args = (
     "MooseX::Traits" => 0,
     "Spreadsheet::ParseExcel" => 0,
     "Spreadsheet::Read" => 0,
+    "Spreadsheet::ReadSXC" => 0,
     "Text::CSV" => 0,
     "namespace::autoclean" => 0,
     "perl" => "5.010"
