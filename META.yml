@@ -33,19 +33,19 @@ no_index:
 provides:
   Data::Importer:
     file: lib/Data/Importer.pm
-    version: '0.003'
+    version: '0.004'
   Data::Importer::Iterator:
     file: lib/Data/Importer/Iterator.pm
-    version: '0.003'
+    version: '0.004'
   Data::Importer::Iterator::Csv:
     file: lib/Data/Importer/Iterator/Csv.pm
-    version: '0.003'
+    version: '0.004'
   Data::Importer::Iterator::Ods:
     file: lib/Data/Importer/Iterator/Ods.pm
-    version: '0.003'
+    version: '0.004'
   Data::Importer::Iterator::Xls:
     file: lib/Data/Importer/Iterator/Xls.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   DateTime: '0'
   DateTime::Format::Pg: '0'
@@ -61,4 +61,4 @@ requires:
 resources:
   homepage: https://github.com/kaare/Data-Importer
   repository: https://github.com/kaare/Data-Importer.git
-version: '0.003'
+version: '0.004'

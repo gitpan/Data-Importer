@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Xls;
-$Data::Importer::Iterator::Xls::VERSION = '0.003';
+$Data::Importer::Iterator::Xls::VERSION = '0.004';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -87,44 +87,45 @@ sub next {
 	state $cc = [$xls->col_range];
 	# Use the first row as column names:
 	if (!$self->has_column_names) {
-		my @fieldnames = map {my $header = lc $_; $header =~ tr/ /_/; $header} $self->get_row_values($xls, @$cc);
+		my @fieldnames = map {my $header = lc $_; $header =~ tr/ /_/; $header} grep {$_} $self->_get_row_values($xls, @$cc);
 		die "Only one column detected, please use comma ',' to separate data." if @fieldnames < 2;
+		my %fieldnames = map {$_ => 1} @fieldnames;
+		if (my @missing = grep {!$fieldnames{$_} } @{ $self->mandatory }) {
+			die 'Column(s) required, but not found:' . join ', ', @missing;
+		}
 
 		$self->column_names(\@fieldnames);
+		$cc->[1] = scalar @fieldnames;
 	}
 	$self->inc_lineno;
-
-	return if grep {!defined $xls->get_cell($self->lineno, $_)} ($cc->[0]..$cc->[1]);
-	return $self->get_row($xls, @$cc);
+	return $self->_get_row($xls, @$cc);
 }
 
-=head2 get_row_values
-
-Used by next
-
-=cut
-
-sub get_row_values {
+sub _get_row_values {
 	my ($self, $xls, $from, $to) = @_;
 	my @cells;
 	push @cells, $xls->get_cell($self->lineno, $_)->value for $from..$to;
 	return @cells;
 }
 
-=head2 get_row
-
-Used by next
-
-=cut
-
-sub get_row {
+sub _get_row {
 	my ($self, $xls, $from, $to) = @_;
 	my $colnames = $self->column_names;
 	my %cells;
-	$cells{ $colnames->[$_ - $from] } = $xls->get_cell($self->lineno, $_)->value for $from..$to;
-	return \%cells;
+	my $cells;
+	for my $colno ($from..$to) {
+		my $colname = $colnames->[$colno - $from] // '';
+		if (my $cell = $xls->get_cell($self->lineno, $colno)) {
+			$cells{ $colname } = $cell->value;
+			$cells++;
+		} else {
+			$cells{ $colname } = undef;
+		}
+	}
+	return $cells ? \%cells : undef;
 }
-1;
+
+__PACKAGE__->meta->make_immutable;
 
 #
 # This file is part of Data-Importer
@@ -134,3 +135,5 @@ sub get_row {
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
+
+__END__

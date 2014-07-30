@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator;
-$Data::Importer::Iterator::VERSION = '0.003';
+$Data::Importer::Iterator::VERSION = '0.004';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -46,6 +46,28 @@ The name of the import file
 has file_name => (
 	is => 'ro',
 	isa => 'Str',
+);
+
+=head2 mandatory
+
+Required input columns
+
+=cut
+
+has 'mandatory' => (
+	is => 'ro',
+	isa => 'ArrayRef',
+);
+
+=head2 optional
+
+Required input columns
+
+=cut
+
+has 'optional' => (
+	is => 'ro',
+	isa => 'ArrayRef',
 );
 
 =head1 "PRIVATE" ATTRIBUTES
@@ -89,7 +111,7 @@ sub next {
 	return 'should be sub classed';
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 #
 # This file is part of Data-Importer
@@ -99,3 +121,5 @@ sub next {
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
+
+__END__

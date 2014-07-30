@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kaare Rasmussen <kaare\@cpan.org>"
   ],
   "dist_name" => "Data-Importer",
-  "dist_version" => "0.003",
+  "dist_version" => "0.004",
   "license" => "perl",
   "module_name" => "Data::Importer",
   "recommends" => {},

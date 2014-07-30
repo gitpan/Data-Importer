@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer;
-$Data::Importer::VERSION = '0.003';
+$Data::Importer::VERSION = '0.004';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -19,13 +19,51 @@ with 'MooseX::Traits';
 
 # ABSTRACT: Framework to import row-based (spreadsheet-, csv-) files into a database
 
-=head1 Description
+=head1 DESCRIPTION
 
 Base class for handling the import of the spreadsheet file
 
-=head1 Atttributes
+Subclass this.
+
+=head1 SYNOPSIS
+
+# Your Importer class
+package My::Importer;
+
+use Moose;
+
+extends 'Data::Importer';
+
+sub mandatory_columns {
+	return [qw/name description price/];
+}
+
+sub validate_row {
+	my ($self, $row, $lineno) = @_;
+	# XXX validation
+	# return $self->add_error("Some error at $lineno") if some condition;
+	# return $self->add_warning("Some warning at $lineno") if some condition;
+	$self->add_row($row);
+}
+
+sub import_row {
+	my ($self, $row) = @_;
+	$schema->resultset('Table')->create($row) or die;
+}
+
+# Import the file like this
+
+my $import = My::Importer->new(
+	schema => $schema,
+	file_name => $file_name,
+);
+$import->do_work;
+
+=head1 ATTTRIBUTES
 
 =head2 schema
+
+Yes, we use DBIx::Class. Send your schema.
 
 =cut
 
@@ -71,6 +109,32 @@ has 'import_type' => (
 	lazy_build => 1,
 );
 
+=head2 mandatory
+
+Required input columns
+
+=cut
+
+has 'mandatory' => (
+	is => 'ro',
+	isa => 'ArrayRef',
+	lazy_build => 1,
+	builder => 'mandatory_columns'
+);
+
+=head2 optional
+
+Required input columns
+
+=cut
+
+has 'optional' => (
+	is => 'ro',
+	isa => 'ArrayRef',
+	lazy_build => 1,
+	builder => 'optional_columns'
+);
+
 =head1 "PRIVATE" ATTRIBUTES
 
 =head2 import_iterator
@@ -83,7 +147,6 @@ has 'import_iterator' => (
 	is => 'ro',
 	lazy_build => 1,
 );
-
 
 =head2 rows
 
@@ -104,6 +167,36 @@ has 'rows' => (
 =head2 warnings
 
 An arrayref w/ all the warnings picked up during processing
+
+These methods are associated with warnings:
+
+=head3 all_warnings
+
+Returns all elements
+
+=head3 add_warning
+
+Add a warning
+
+=head3 join_warnings
+
+Join all warnings
+
+=head3 count_warnings
+
+Returns the number of warnings
+
+=head3 has_warnings
+
+Returns true if there are warnings
+
+=head3 has_no_warnings
+
+Returns true if there isn't any warning
+
+=head3 clear_warnings
+
+Clear out all warnings
 
 =cut
 
@@ -126,6 +219,36 @@ has 'warnings' => (
 =head2 errors
 
 An arrayref w/ all the errors picked up during processing
+
+These methods are associated with errors:
+
+=head3 all_errors
+
+Returns all elements
+
+=head3 add_error
+
+Add a error
+
+=head3 join_errors
+
+Join all errors
+
+=head3 count_errors
+
+Returns the number of errors
+
+=head3 has_errors
+
+Returns true if there are errors
+
+=head3 has_no_errors
+
+Returns true if there isn't any error
+
+=head3 clear_errors
+
+Clear out all errors
 
 =cut
 
@@ -162,10 +285,6 @@ has 'timestamp' => (
 
 =head1 METHODS
 
-=head2 _build_import_type
-
-Build the import type. It can be either csv, xls or ods.
-
 =cut
 
 sub _build_import_type {
@@ -176,19 +295,33 @@ sub _build_import_type {
 	return lc $1;
 }
 
-=head2 _build_import_iterator
-
-Build the import iterator..
-
-=cut
-
 sub _build_import_iterator {
 	my $self = shift;
 	my $import_type = ucfirst $self->import_type;
 	my $classname = "Data::Importer::Iterator::$import_type";
 	eval "require $classname" or die $@;
-	return $classname->new(file_name => $self->file_name);
+	return $classname->new(
+		file_name => $self->file_name,
+		mandatory => $self->mandatory,
+		optional  => $self->optional,
+	);
 }
+
+=head2 mandatory_columns
+
+Builds the mandatory attribute, which gives an arrayref with the required columns.
+
+=cut
+
+sub mandatory_columns { [] }
+
+=head2 optional_columns
+
+Builds the optional attribute, which gives an arrayref with the optional columns.
+
+=cut
+
+sub optional_columns { [] }
 
 =head2 do_work
 
@@ -200,7 +333,8 @@ sub do_work {
 	my $self = shift;
 	$self->validate;
 	$self->import_run unless $self->dry_run or $self->has_errors;
-	$self->report
+	$self->report;
+	return 1;
 }
 
 =head2 validate
@@ -222,18 +356,13 @@ sub validate {
 
 Handle each individual row.
 
+This has to be written in the subclass
+
 =cut
 
 sub validate_row {
 	my ($self, $row, $lineno) = @_;
-
-	# XXX validation
-	# return $self->add_error("Some error at $lineno") if some condition;
-	# return $self->add_warning("Some warning at $lineno") if some condition;
-
-	# XXX processing
-	# XXX caching
-
+	die "You have to provide your own validate_row";
 }
 
 =head2 import_run
@@ -264,7 +393,10 @@ sub import_run {
 
 =head2 import_transaction
 
-Called inside the transaction block
+Called inside the transaction block.
+
+This is the method to add method modifiers to if processing before or after the
+row import loop is necessary.
 
 =cut
 
@@ -274,6 +406,19 @@ sub import_transaction {
 	for my $row (@{ $self->rows }) {
 		$self->import_row($row);
 	}
+}
+
+=head2 import_row
+
+Handle each individual row.
+
+This has to be written in the subclass
+
+=cut
+
+sub import_row {
+	my ($self, $row, $lineno) = @_;
+	die "You have to provide your own import_row";
 }
 
 =head2 import_failed
@@ -289,7 +434,7 @@ sub import_failed {
 
 =head2 import_succeeded
 
-Called after the import has finished succesful
+Called after the import has finished succesfully
 
 =cut
 
@@ -303,6 +448,8 @@ Make a report of what happened
 
 sub report {
 	my ($self) = @_;
+	warn 'Warnings: ' . join("\n", @{ $self->warnings }) if $self->has_warnings;
+	warn 'Errors ' . join("\n", @{ $self->errors }) if $self->has_errors;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -315,3 +462,5 @@ __PACKAGE__->meta->make_immutable;
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
+
+__END__
