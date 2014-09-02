@@ -35,6 +35,9 @@ ATTTRIBUTES
   file_name
     The name of the spreadsheet
 
+  encoding
+    The encoding of the spreadsheet
+
   import_type
     Three formats are supported, csv, xls, ods
 

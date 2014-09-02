@@ -11,6 +11,7 @@ my %module_build_args = (
     "Module::Build" => "0.3601"
   },
   "configure_requires" => {
+    "ExtUtils::MakeMaker" => "6.30",
     "Module::Build" => "0.3601"
   },
   "dist_abstract" => "Framework to import row-based (spreadsheet-, csv-) files into a database",
@@ -18,7 +19,7 @@ my %module_build_args = (
     "Kaare Rasmussen <kaare\@cpan.org>"
   ],
   "dist_name" => "Data-Importer",
-  "dist_version" => "0.004",
+  "dist_version" => "0.005",
   "license" => "perl",
   "module_name" => "Data::Importer",
   "recommends" => {},
@@ -26,11 +27,11 @@ my %module_build_args = (
   "requires" => {
     "DateTime" => 0,
     "DateTime::Format::Pg" => 0,
+    "Encode" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::Traits" => 0,
     "Spreadsheet::ParseExcel" => 0,
-    "Spreadsheet::Read" => 0,
     "Spreadsheet::ReadSXC" => 0,
     "Text::CSV" => 0,
     "namespace::autoclean" => 0,

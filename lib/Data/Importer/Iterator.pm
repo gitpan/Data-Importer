@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator;
-$Data::Importer::Iterator::VERSION = '0.004';
+$Data::Importer::Iterator::VERSION = '0.005';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -70,6 +70,18 @@ has 'optional' => (
 	isa => 'ArrayRef',
 );
 
+=head2 encoding
+
+The encoding of the spreadsheet
+
+=cut
+
+has encoding => (
+	is => 'ro',
+	isa => 'Str',
+	predicate => 'has_encoding',
+);
+
 =head1 "PRIVATE" ATTRIBUTES
 
 =head2 file
@@ -96,7 +108,7 @@ The base class opens a file as UTF-8 and returns it.
 sub _build_file {
 	my $self = shift;
 	my $filename = $self->file_name;
-	open(my $file, "<:encoding(UTF-8)", $filename) or die "$filename: $!";
+	open(my $file, "<:encoding(utf8)", $filename) or die "$filename: $!";
 
 	return $file;
 }

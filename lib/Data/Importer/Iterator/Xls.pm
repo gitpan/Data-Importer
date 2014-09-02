@@ -7,10 +7,11 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Xls;
-$Data::Importer::Iterator::Xls::VERSION = '0.004';
+$Data::Importer::Iterator::Xls::VERSION = '0.005';
 use 5.010;
 use namespace::autoclean;
 use Moose;
+use Encode qw(encode);
 use Spreadsheet::ParseExcel;
 
 extends 'Data::Importer::Iterator';
@@ -116,7 +117,13 @@ sub _get_row {
 	for my $colno ($from..$to) {
 		my $colname = $colnames->[$colno - $from] // '';
 		if (my $cell = $xls->get_cell($self->lineno, $colno)) {
-			$cells{ $colname } = $cell->value;
+			my $value = $cell->value;
+			if ($cell->encoding == 2) {
+				$value = encode('utf-16BE', $cell->value);
+			} elsif ($self->has_encoding) {
+				$value = encode($self->encoding, $value);
+			}
+			$cells{ $colname } = $value;
 			$cells++;
 		} else {
 			$cells{ $colname } = undef;

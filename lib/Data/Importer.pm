@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer;
-$Data::Importer::VERSION = '0.004';
+$Data::Importer::VERSION = '0.005';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -93,6 +93,19 @@ The name of the spreadsheet
 has file_name => (
 	is => 'ro',
 	isa => 'Str',
+);
+
+=head2 encoding
+
+The encoding of the spreadsheet
+
+=cut
+
+has encoding => (
+	is => 'ro',
+	isa => 'Str',
+	default => 'utf8',
+	lazy => 1,
 );
 
 =head2 import_type
@@ -304,6 +317,7 @@ sub _build_import_iterator {
 		file_name => $self->file_name,
 		mandatory => $self->mandatory,
 		optional  => $self->optional,
+		encoding  => $self->encoding,
 	);
 }
 

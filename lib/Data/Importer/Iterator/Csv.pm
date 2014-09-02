@@ -7,11 +7,12 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Csv;
-$Data::Importer::Iterator::Csv::VERSION = '0.004';
+$Data::Importer::Iterator::Csv::VERSION = '0.005';
 use 5.010;
 use namespace::autoclean;
 use Moose;
 use Text::CSV;
+use Encode qw/encode/;
 
 extends 'Data::Importer::Iterator';
 
@@ -34,6 +35,17 @@ has 'csv' => (
 
 =head1 "PRIVATE" ATTRIBUTES
 
+=head2 file
+
+The import file
+
+=cut
+
+has 'file' => (
+	is => 'ro',
+	lazy_build => 1,
+);
+
 =head1 METHODS
 
 =head2 _build_csv
@@ -46,6 +58,22 @@ sub _build_csv {
 	my $self = shift;
 	my $csv = Text::CSV->new ({ binary => 1, eol => $/ });
 	return $csv;
+}
+
+=head2 _build_file
+
+The lazy builder for the file
+
+The base class opens a file as UTF-8 and returns it.
+
+=cut
+
+sub _build_file {
+	my $self = shift;
+	my $filename = $self->file_name;
+	open(my $file, "<:encoding(utf8)", $filename) or die "$filename: $!";
+
+	return $file;
 }
 
 =head2 next
@@ -71,7 +99,9 @@ sub next {
 		$csv->column_names(@fieldnames);
 	}
 	$self->inc_lineno;
-    return $csv->getline_hr($file);
+	my $line = $csv->getline_hr($file) or return;
+	my $row = $self->has_encoding ? { map {$_ => encode($self->encoding, $line->{$_})} keys %$line } : $line;
+	return $row;
 }
 
 __PACKAGE__->meta->make_immutable;
