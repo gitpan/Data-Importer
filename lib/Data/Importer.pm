@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer;
-$Data::Importer::VERSION = '0.005';
+$Data::Importer::VERSION = '0.006';
 use 5.010;
 use namespace::autoclean;
 use Moose;

@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Csv;
-$Data::Importer::Iterator::Csv::VERSION = '0.005';
+$Data::Importer::Iterator::Csv::VERSION = '0.006';
 use 5.010;
 use namespace::autoclean;
 use Moose;
@@ -71,7 +71,8 @@ The base class opens a file as UTF-8 and returns it.
 sub _build_file {
 	my $self = shift;
 	my $filename = $self->file_name;
-	open(my $file, "<:encoding(utf8)", $filename) or die "$filename: $!";
+	my $attr = $self->has_encoding ? ':encoding(' . $self->encoding . ')' : '';
+	open(my $file, "<$attr", $filename) or die "$filename: $!";
 
 	return $file;
 }
@@ -99,9 +100,7 @@ sub next {
 		$csv->column_names(@fieldnames);
 	}
 	$self->inc_lineno;
-	my $line = $csv->getline_hr($file) or return;
-	my $row = $self->has_encoding ? { map {$_ => encode($self->encoding, $line->{$_})} keys %$line } : $line;
-	return $row;
+	return $csv->getline_hr($file);
 }
 
 __PACKAGE__->meta->make_immutable;

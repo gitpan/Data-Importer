@@ -7,11 +7,10 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Ods;
-$Data::Importer::Iterator::Ods::VERSION = '0.005';
+$Data::Importer::Iterator::Ods::VERSION = '0.006';
 use 5.010;
 use namespace::autoclean;
 use Moose;
-use Encode qw(encode);
 use Spreadsheet::ReadSXC qw/read_sxc/;
 
 extends 'Data::Importer::Iterator';
@@ -117,7 +116,6 @@ sub next {
 	return unless grep { $_ } @cells;
 
 	my $colno = 0;
-    @cells = map { encode($self->encoding, $_) } @cells if $self->has_encoding;
     return { map { $columns->[$colno++] => $_ } @cells };
 }
 

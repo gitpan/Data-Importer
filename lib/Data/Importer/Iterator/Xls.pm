@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Data::Importer::Iterator::Xls;
-$Data::Importer::Iterator::Xls::VERSION = '0.005';
+$Data::Importer::Iterator::Xls::VERSION = '0.006';
 use 5.010;
 use namespace::autoclean;
 use Moose;
